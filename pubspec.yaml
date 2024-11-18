@@ -1,0 +1,37 @@
+name: pragament_mail
+description: "A new Flutter project."
+publish_to: "none"
+version: 0.1.0
+
+environment:
+  sdk: ^3.5.4
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  go_router: ^14.4.1
+  email_validator: ^3.0.0
+  flutter_riverpod: ^2.6.1
+  riverpod_annotation: ^2.6.1
+  graphql_flutter: ^5.1.2
+  hive_flutter: ^1.1.0
+  intl: ^0.19.0
+  envied: ^1.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+  build_runner:
+  riverpod_generator:
+  go_router_builder:
+  hive_generator:
+  envied_generator:
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/
