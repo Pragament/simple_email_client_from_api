@@ -1,12 +1,13 @@
 class Email {
   String id;
-  String toAccountId;
-  String toName;
+  String? toAccountId;
+  String? toName;
   String toEmail;
   String fromName;
   String fromEmail;
   String subject;
   String body;
+  String snippet;
   bool isHtml;
   DateTime datetime;
   String orgId;
@@ -21,6 +22,7 @@ class Email {
     required this.fromEmail,
     required this.subject,
     required this.body,
+    required this.snippet,
     required this.isHtml,
     required this.datetime,
     required this.orgId,
@@ -36,6 +38,7 @@ class Email {
     String? fromEmail,
     String? subject,
     String? body,
+    String? snippet,
     bool? isHtml,
     DateTime? datetime,
     String? orgId,
@@ -50,6 +53,7 @@ class Email {
         fromEmail: fromEmail ?? this.fromEmail,
         subject: subject ?? this.subject,
         body: body ?? this.body,
+        snippet: snippet ?? this.snippet,
         isHtml: isHtml ?? this.isHtml,
         datetime: datetime ?? this.datetime,
         orgId: orgId ?? this.orgId,
@@ -60,11 +64,12 @@ class Email {
         id: json["id"],
         toAccountId: json["to_account_id"],
         toName: json["to_name"],
-        toEmail: json["to_email"],
+        toEmail: json["to_account_id"],
         fromName: json["from_name"],
-        fromEmail: json["from_email"],
+        fromEmail: json["from_email_id"],
         subject: json["subject"],
         body: json["body"],
+        snippet: json["snippet"],
         isHtml: json["is_html"],
         datetime:
             DateTime.fromMillisecondsSinceEpoch(int.parse(json["datetime"])),
@@ -81,6 +86,7 @@ class Email {
         "from_email": fromEmail,
         "subject": subject,
         "body": body,
+        "snippet": snippet,
         "is_html": isHtml,
         "datetime": datetime.millisecondsSinceEpoch,
         "org_id": orgId,
