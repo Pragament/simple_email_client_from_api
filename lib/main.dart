@@ -3,11 +3,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:pragament_mail/constants.dart';
 import 'package:pragament_mail/presentation/routes/router.dart';
+import 'package:webview_flutter_platform_interface/webview_flutter_platform_interface.dart';
+import 'package:webview_flutter_web/webview_flutter_web.dart';
 
 void main() async {
   await Hive.initFlutter();
 
   await Hive.openBox<dynamic>('settingsBox');
+  WebViewPlatform.instance = WebWebViewPlatform();
 
   runApp(const ProviderScope(child: MainApp()));
 }

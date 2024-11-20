@@ -1,9 +1,11 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pragament_mail/data/graphql/graphql_requests.dart';
-import 'package:pragament_mail/data/logic/organization_account_providers.dart';
+import 'package:pragament_mail/data/logic/organization_provider.dart';
 import 'package:pragament_mail/data/settings.dart';
+import 'package:pragament_mail/data/temp.dart';
 import 'package:pragament_mail/presentation/widgets/my_snackbar.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
@@ -40,7 +42,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
     final organizationNotifier =
         ref.read(oraganizationNotifierProvider.notifier);
-    final accountNotifier = ref.read(accountNotifierProvider.notifier);
 
     // This widget creates rounded container as a backround to it's child
     Widget textFieldContainer({required Widget child}) => Padding(
@@ -108,7 +109,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                             textFieldContainer(
                               child: TextFormField(
                                 controller: otpC,
-                                keyboardType: TextInputType.visiblePassword,
+                                keyboardType: TextInputType.phone,
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.deny(
+                                      RegExp(r'[^0-9]'))
+                                ],
+                                maxLength: 6,
                                 textInputAction: TextInputAction.next,
                                 validator: (value) {
                                   if (value!.isEmpty) {
@@ -131,6 +137,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                 controller: emailC,
                                 keyboardType: TextInputType.emailAddress,
                                 textInputAction: TextInputAction.next,
+                                inputFormatters: [
+                                  FilteringTextInputFormatter.allow(
+                                      RegExp(r'^[a-zA-Z0-9]+$'))
+                                ],
                                 validator: (value) =>
                                     // Popular Email validation package
                                     EmailValidator.validate(value != null
@@ -158,6 +168,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                   textInputAction: isValidated
                                       ? TextInputAction.next
                                       : TextInputAction.done,
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.allow(
+                                        RegExp(r'^[a-zA-Z0-9]+$'))
+                                  ],
                                   validator: (value) {
                                     // Form validation which shows errors for the user
                                     if (value!.isEmpty || value.length <= 6) {
@@ -188,7 +202,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                 controller: rePasswordC,
                                 obscureText: true,
                                 validator: (value) {
-                                  if (value!.isEmpty || value.length < 6) {
+                                  if (value!.isEmpty || value.length <= 6) {
                                     return 'Minimum 6 charaters';
                                   } else if (value != passwordC.text) {
                                     return 'Password mismatch';
@@ -212,7 +226,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                   setState(() => isLoading = true);
                                   if (isValidated) {
                                     if (isNewUser) {
-                                      final account = await GraphQLRequests('0')
+                                      final acc = await GraphQLRequests('0')
                                           .createAccount(
                                         orgId: organization!.id,
                                         emailLocalPart: emailC.text,
@@ -220,8 +234,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                         secondaryEmailId: '0',
                                       );
 
-                                      if (account != null) {
-                                        accountNotifier.update(account);
+                                      if (acc != null) {
+                                        account = acc;
 
                                         ref
                                             .read(loginStateNotifierProvider
@@ -232,12 +246,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                             message: 'Something went wrong');
                                       }
                                     } else {
-                                      final account = await GraphQLRequests('0')
+                                      final acc = await GraphQLRequests('0')
                                           .getAccount(
                                               emailC.text, passwordC.text);
 
-                                      if (account != null) {
-                                        accountNotifier.update(account);
+                                      if (acc != null) {
+                                        account = acc;
 
                                         ref
                                             .read(loginStateNotifierProvider
@@ -252,7 +266,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                   } else {
                                     final organization =
                                         await GraphQLRequests('0')
-                                            .getOrgById(otpC.text);
+                                            .checkOTPValidity(otpC.text);
 
                                     if (organization != null) {
                                       organizationNotifier.update(organization);

@@ -46,7 +46,6 @@ class GraphQLRequests {
   Future<Organization?> getOrgById(String orgId) async {
     final response = await GraphQLService(token)
         .performQuery(GraphQLRaw.getOrgById, variables: {'id': orgId});
-    printInDebug('Has exeption: ${response.exception}');
 
     if (response.hasException) {
       printInDebug('GraphQL Error: ${response.exception}');
@@ -62,11 +61,10 @@ class GraphQLRequests {
         : null;
   }
 
-  Future<Account?> getAccount(String email, String password) async {
-    final response = await GraphQLService(token).performQuery(
-        GraphQLRaw.getAccount,
-        variables: {'email_local_part': email, 'password': password});
-    printInDebug('Has exeption: ${response.exception}');
+  Future<Organization?> checkOTPValidity(String code) async {
+    final response = await GraphQLService(token).performMutation(
+        GraphQLRaw.checkOTPValidity,
+        variables: {'code': code});
 
     if (response.hasException) {
       printInDebug('GraphQL Error: ${response.exception}');
@@ -76,8 +74,25 @@ class GraphQLRequests {
     final Map<String, dynamic>? data = response.data;
 
     return data != null &&
-            data.containsKey('getAllAccounts') &&
-            data['getAllAccounts'].isNotEmpty
+            data.containsKey('checkOTPValidity') &&
+            data['checkOTPValidity'] != null
+        ? Organization.fromMap(data['checkOTPValidity'] as Map<String, dynamic>)
+        : null;
+  }
+
+  Future<Account?> getAccount(String email, String password) async {
+    final response = await GraphQLService(token).performQuery(
+        GraphQLRaw.getAccount,
+        variables: {'email_local_part': email, 'password': password});
+
+    if (response.hasException) {
+      printInDebug('GraphQL Error: ${response.exception}');
+      return null;
+    }
+
+    final Map<String, dynamic>? data = response.data;
+
+    return data != null && data.containsKey('getAllAccounts')
         ? Account.fromMap((data['getAllAccounts'] as List<dynamic>).first
             as Map<String, dynamic>)
         : null;
@@ -87,7 +102,6 @@ class GraphQLRequests {
     final response = await GraphQLService(token).performQuery(
         GraphQLRaw.getEmailsByAccountId,
         variables: {'account_id': accountId});
-    printInDebug('Has exeption: ${response.exception}');
 
     if (response.hasException) {
       printInDebug('GraphQL Error: ${response.exception}');

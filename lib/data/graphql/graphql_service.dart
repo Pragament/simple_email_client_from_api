@@ -27,9 +27,6 @@ class GraphQLService {
         variables: variables,
         fetchPolicy: FetchPolicy.networkOnly);
     final QueryResult result = await client.query(options);
-    if (result.hasException) {
-      throw result.exception!;
-    }
     return result;
   }
 

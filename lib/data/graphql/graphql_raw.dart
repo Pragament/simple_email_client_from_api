@@ -27,6 +27,21 @@ query getOrgById($id: ID!) {
 }
 ''';
 
+  static const checkOTPValidity = r'''
+mutation checkOTPValidity($code: String) {
+  checkOTPValidity(code: $code) {
+    id
+    name
+    email_domain_part
+    datetime
+    email_id
+    mode
+    client_api_key
+    user_id
+  }
+}
+''';
+
   static const getAccount = r'''
 query getAllAccounts($email_local_part: String, $password: String) {
   getAllAccounts(email_local_part: $email_local_part, password: $password) {
@@ -46,6 +61,7 @@ query getEmailsByAccountId($account_id: ID!) {
     from_email_id
     subject
     body
+    snippet
     is_html
     datetime
     org_id
